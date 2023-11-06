@@ -5,7 +5,8 @@ const { log } = console;
 
 // The overall string to be solved
 let str: string =
-  "..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..";
+  "5....28.......7..4..654.3..7..89...3.1....6.......4...8..35...9..7....8....2.....";
+// "..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..";
 
 let board: any[] = str
   .split("")
@@ -20,9 +21,10 @@ let board: any[] = str
 
 log("BOARD BEFORE FILTERING", board);
 
-let redo: boolean = true;
+// let redo: boolean = true;
+let redo: number = 0;
 
-while (redo === true) {
+while (redo < 100) {
   board = board.map((item: any, index: number) => {
     return (item = item.map((item2: any, index2: number) => {
       if (item2 === ".") {
@@ -117,10 +119,12 @@ while (redo === true) {
       }
     }));
   });
-  redo = false;
-  board.forEach((arr: string[]) => {
-    arr.includes(".") ? (redo = true) : null;
-  });
+
+  redo++;
+  // redo = false;
+  // board.forEach((arr: string[]) => {
+  //   arr.includes(".") ? (redo = true) : null;
+  // });
 }
 log("BOARD AFTER FILTERING", board);
 
