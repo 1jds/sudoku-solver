@@ -5,8 +5,9 @@ const { log } = console;
 
 // The overall string to be solved
 let str: string =
-  "5....28.......7..4..654.3..7..89...3.1....6.......4...8..35...9..7....8....2.....";
+  "....13......68..1.7.9....8.....45..1..5..63..34.......5....9....7..6259..2......4";
 // "..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..";
+// "5....28.......7..4..654.3..7..89...3.1....6.......4...8..35...9..7....8....2.....";
 
 let board: any[] = str
   .split("")
@@ -27,7 +28,7 @@ let redo: number = 0;
 while (redo < 100) {
   board = board.map((item: any, index: number) => {
     return (item = item.map((item2: any, index2: number) => {
-      if (item2 === ".") {
+      if (item2 === "." || item2.length > 1) {
         // set up possibilites for current cell
         let possibilities: string[] = [
           "1",
@@ -40,6 +41,9 @@ while (redo < 100) {
           "8",
           "9",
         ];
+        if (item2.length > 1) {
+          possibilities = item2;
+        }
         // if (index === 0 && index2 === 3) {
         //   log("before any filtering", possibilities);
         // }
@@ -103,16 +107,67 @@ while (redo < 100) {
         // if (index === 0 && index2 === 3) {
         //   log("current square values", currentSquareValues);
         // }
+        // if (index === 0 && index2 === 3) {
+        //   log("current square values", currentSquareValues);
+        // }
         possibilities = possibilities.filter(
           (val3) => !currentSquareValues.includes(val3)
         );
         // if (index === 0 && index2 === 3) {
         //   log("after square filter", possibilities);
         // }
+        // test current cell against other indeterminate cells in same square using array.flat()
+
+        const uniqueValueInBoardRegion = (testArray: any[]) => {
+          let flattenedSquare: string[] = testArray
+            .filter((item: any) => typeof item === "object")
+            .flat();
+
+          function countOccurrences(arr: string[]): { [key: string]: number } {
+            const count: { [key: string]: number } = {};
+            arr.forEach((item) => {
+              count[item] = (count[item] || 0) + 1;
+            });
+            return count;
+          }
+
+          let occurencesObj: { [key: string]: number } =
+            countOccurrences(flattenedSquare);
+
+          function findKeyWithValueEqualsOne(obj: {
+            [key: string]: number;
+          }): string | undefined {
+            for (let key in obj) {
+              if (obj[key] === 1) {
+                return key;
+              }
+            }
+          }
+
+          let uniqueKey: any = findKeyWithValueEqualsOne(occurencesObj);
+          if (possibilities.includes(uniqueKey)) {
+            possibilities = [uniqueKey];
+          }
+        };
+
+        if (possibilities.length > 1) {
+          uniqueValueInBoardRegion(currentSquareValues);
+          uniqueValueInBoardRegion(item);
+          uniqueValueInBoardRegion(columnValues);
+        }
+
+        // if (index === 0 && index2 === 3) {
+        //   console.log(
+        //     "our flattened square of relevant values",
+        //     flattenedSquare
+        //   );
+        // }
+
+        // return value
         if (possibilities.length === 1) {
           return possibilities[0];
         } else {
-          return ".";
+          return possibilities;
         }
       } else {
         return item2;
@@ -126,6 +181,7 @@ while (redo < 100) {
   //   arr.includes(".") ? (redo = true) : null;
   // });
 }
+
 log("BOARD AFTER FILTERING", board);
 
 // // The item that one is currently attempting to solve
