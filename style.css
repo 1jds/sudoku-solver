@@ -1,0 +1,54 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  --cell-width: 70px;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+img {
+  max-width: 100%;
+}
+
+.page-wrapper {
+  display: grid;
+  place-content: center;
+  min-height: 100%;
+}
+
+h1 {
+  text-align: center;
+}
+
+.board-item {
+  aspect-ratio: 1;
+  text-align: center;
+}
+
+.board-container {
+  display: flex;
+  flex-wrap: wrap;
+  width: calc(var(--cell-width) * 9 + 12px);
+}
+
+.board-square {
+  width: calc(var(--cell-width) * 3 + 4px);
+  border: 2px solid black;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.board-cell {
+  width: var(--cell-width);
+  border: 1px solid black;
+  display: grid;
+  place-content: center;
+}
