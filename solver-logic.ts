@@ -186,33 +186,30 @@ while (redo < 100) {
 
 log("BOARD AFTER FILTERING", board);
 
-// // The item that one is currently attempting to solve
-// let item = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
+// let reducedBoard: string[] = board.reduce(
+//   (acc: [], curr: [], index: number) => {
+//     let newAcc: string[] = [...acc];
+//     curr.forEach((element) => {
+//       if (typeof element === "object") {
+//         newAcc.push(".");
+//       } else if (typeof element === "string") {
+//         newAcc.push(element);
+//       }
+//     });
+//     return newAcc;
+//   },
+//   []
+// );
+let flattenedBoard: any[] = board.flat();
 
-// let square = str.slice(0, 3) + str.slice(9, 12) + str.slice(18, 21);
-// let row = str.slice(0, 9);
-// let column =
-//   str[0] +
-//   str[9] +
-//   str[18] +
-//   str[27] +
-//   str[36] +
-//   str[45] +
-//   str[54] +
-//   str[63] +
-//   str[72];
+log("FLATTENED BOARD AFTER FIRST PASS", flattenedBoard);
 
-// let all = square + row + column;
+flattenedBoard.forEach((item: string | [], index: number) => {
+  let cell: any = document.querySelector(`#cell${index}`);
+  cell.innerText = item;
+});
 
-// let eliminateArray = all.split("").filter((item) => item !== ".");
-
-// let filteredItem = item.filter((item) => {
-//   if (!eliminateArray.includes(item)) {
-//     return item;
-//   }
+// let cells: any = document.querySelectorAll("[id^='cell']");
+// cells.forEach((item, index) => {
+//   item.innerText = reducedBoard[index];
 // });
-
-// if (filteredItem.length === 1) {
-// }
-
-// log(filteredItem);
