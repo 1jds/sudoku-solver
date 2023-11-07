@@ -158,6 +158,39 @@ while (redo < 100) {
           uniqueValueInBoardRegion(columnValues);
         }
 
+        // THIS WHOLE BLCOK FROM 162-193 IS CAUSING PROBLEMS. I THINK IT IS BECAUSE I AM CALLING item = item.map INSIDE WHAT I START WITH AT 31 WHICH IS ALSO item = item.map. I GUESS I COULD TRY TO CHANGE THIS SO THAT IT ALL HAPPENS AFTER THE BLOCK STARTING AT 31... OR ELSE I COULD JUST FILTER THE CURRENT CELL RATHER THAN THE ENTIRE ROW AT ONCE...
+        if (possibilities.length > 1) {
+          //remove values for magic pairs such as two cells which have ["2","3"] in a row - this means that no other cells in that row can properly contain a "2" or a "3" and, as such, those can be filtered out
+          let magicPair: string[] = [];
+          let index1: number;
+          let index2: number;
+          item.forEach((itm: any, indx: number) => {
+            if (typeof itm === "object" && itm.length === 2) {
+              let restOfRow = item.slice(index + 1);
+              restOfRow.forEach((itm2: any, indx2: number) => {
+                if (
+                  itm2.length === 2 &&
+                  itm[0] === itm2[0] &&
+                  itm[1] === itm2[1]
+                ) {
+                  magicPair = [...itm];
+                  index1 = indx;
+                  index2 = indx + 1 + indx2;
+                }
+              });
+            }
+          });
+          item = item.map((itm: any, indx: number) => {
+            if (typeof itm === "string") {
+              return itm;
+            } else if (indx === index1 || index === index2) {
+              return itm;
+            } else {
+              //filter out any magicPair[0] or magicPair[1] values from this array
+              itm = itm.filter((value: string) => !magicPair.includes(value));
+            }
+          });
+        }
         // if (index === 0 && index2 === 3) {
         //   console.log(
         //     "our flattened square of relevant values",
@@ -204,10 +237,13 @@ let flattenedBoard: any[] = board.flat();
 
 log("FLATTENED BOARD AFTER FIRST PASS", flattenedBoard);
 
-flattenedBoard.forEach((item: string | [], index: number) => {
-  let cell: any = document.querySelector(`#cell${index}`);
-  cell.innerText = item;
-});
+// This is commented out for ts-node execution, but needs to be unedited for HTML injection...
+// flattenedBoard.forEach((item: string | [], index: number) => {
+//   let cell: any = document.querySelector(`#cell${index}`);
+//   cell.innerText = item;
+// });
+
+// I can delete this, it's just interesting to see how one can use querySelectorAll on attributes/partial attributes
 
 // let cells: any = document.querySelectorAll("[id^='cell']");
 // cells.forEach((item, index) => {
