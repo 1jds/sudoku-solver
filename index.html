@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <script src="solver-logic.js" defer></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <h1>Hello, Sudoku Solver!</h1>
+      <div class="board-container board-item">
+        <div class="board-square board-item">
+          <div id="cell0" class="board-cell board-item">A</div>
+          <div id="cell1" class="board-cell board-item">B</div>
+          <div id="cell2" class="board-cell board-item">C</div>
+          <div id="cell9" class="board-cell board-item">D</div>
+          <div id="cell10" class="board-cell board-item">E</div>
+          <div id="cell11" class="board-cell board-item">F</div>
+          <div id="cell18" class="board-cell board-item">G</div>
+          <div id="cell19" class="board-cell board-item">H</div>
+          <div id="cell20" class="board-cell board-item">I</div>
+        </div>
+        <div class="board-square board-item">
+          <div id="cell3" class="board-cell board-item">A</div>
+          <div id="cell4" class="board-cell board-item">B</div>
+          <div id="cell5" class="board-cell board-item">C</div>
+          <div id="cell12" class="board-cell board-item">D</div>
+          <div id="cell13" class="board-cell board-item">E</div>
+          <div id="cell14" class="board-cell board-item">F</div>
+          <div id="cell21" class="board-cell board-item">G</div>
+          <div id="cell22" class="board-cell board-item">H</div>
+          <div id="cell23" class="board-cell board-item">I</div>
+        </div>
+        <div class="board-square board-item">
+          <div id="cell6" class="board-cell board-item">A</div>
+          <div id="cell7" class="board-cell board-item">B</div>
+          <div id="cell8" class="board-cell board-item">C</div>
+          <div id="cell15" class="board-cell board-item">D</div>
+          <div id="cell16" class="board-cell board-item">E</div>
+          <div id="cell17" class="board-cell board-item">F</div>
+          <div id="cell24" class="board-cell board-item">G</div>
+          <div id="cell25" class="board-cell board-item">H</div>
+          <div id="cell26" class="board-cell board-item">I</div>
+        </div>
+        <div class="board-square board-item">
+          <div id="cell27" class="board-cell board-item">A</div>
+          <div id="cell28" class="board-cell board-item">B</div>
+          <div id="cell29" class="board-cell board-item">C</div>
+          <div id="cell36" class="board-cell board-item">D</div>
+          <div id="cell37" class="board-cell board-item">E</div>
+          <div id="cell38" class="board-cell board-item">F</div>
+          <div id="cell45" class="board-cell board-item">G</div>
+          <div id="cell46" class="board-cell board-item">H</div>
+          <div id="cell47" class="board-cell board-item">I</div>
+        </div>
+        <div class="board-square board-item">
+          <div id="cell30" class="board-cell board-item">A</div>
+          <div id="cell31" class="board-cell board-item">B</div>
+          <div id="cell32" class="board-cell board-item">C</div>
+          <div id="cell39" class="board-cell board-item">D</div>
+          <div id="cell40" class="board-cell board-item">E</div>
+          <div id="cell41" class="board-cell board-item">F</div>
+          <div id="cell48" class="board-cell board-item">G</div>
+          <div id="cell49" class="board-cell board-item">H</div>
+          <div id="cell50" class="board-cell board-item">I</div>
+        </div>
+        <div class="board-square board-item">
+          <div id="cell33" class="board-cell board-item">A</div>
+          <div id="cell34" class="board-cell board-item">B</div>
+          <div id="cell35" class="board-cell board-item">C</div>
+          <div id="cell42" class="board-cell board-item">D</div>
+          <div id="cell43" class="board-cell board-item">E</div>
+          <div id="cell44" class="board-cell board-item">F</div>
+          <div id="cell51" class="board-cell board-item">G</div>
+          <div id="cell52" class="board-cell board-item">H</div>
+          <div id="cell53" class="board-cell board-item">I</div>
+        </div>
+        <div class="board-square board-item">
+          <div id="cell54" class="board-cell board-item">A</div>
+          <div id="cell55" class="board-cell board-item">B</div>
+          <div id="cell56" class="board-cell board-item">C</div>
+          <div id="cell63" class="board-cell board-item">D</div>
+          <div id="cell64" class="board-cell board-item">E</div>
+          <div id="cell65" class="board-cell board-item">F</div>
+          <div id="cell72" class="board-cell board-item">G</div>
+          <div id="cell73" class="board-cell board-item">H</div>
+          <div id="cell74" class="board-cell board-item">I</div>
+        </div>
+        <div class="board-square board-item">
+          <div id="cell57" class="board-cell board-item">A</div>
+          <div id="cell58" class="board-cell board-item">B</div>
+          <div id="cell59" class="board-cell board-item">C</div>
+          <div id="cell66" class="board-cell board-item">D</div>
+          <div id="cell67" class="board-cell board-item">E</div>
+          <div id="cell68" class="board-cell board-item">F</div>
+          <div id="cell75" class="board-cell board-item">G</div>
+          <div id="cell76" class="board-cell board-item">H</div>
+          <div id="cell77" class="board-cell board-item">I</div>
+        </div>
+        <div class="board-square board-item">
+          <div id="cell60" class="board-cell board-item">A</div>
+          <div id="cell61" class="board-cell board-item">B</div>
+          <div id="cell62" class="board-cell board-item">C</div>
+          <div id="cell69" class="board-cell board-item">D</div>
+          <div id="cell70" class="board-cell board-item">E</div>
+          <div id="cell71" class="board-cell board-item">F</div>
+          <div id="cell78" class="board-cell board-item">G</div>
+          <div id="cell79" class="board-cell board-item">H</div>
+          <div id="cell80" class="board-cell board-item">I</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
