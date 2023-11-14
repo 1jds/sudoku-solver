@@ -1,13 +1,19 @@
 "use strict";
 const { log } = console;
-// ..9..5.1. 85.4....2 432...... 1...69.83 .9.....6. 62.71...9 ......194 5....4.37 .4.3..6..
-// Solve this...
 // The overall string to be solved
 let str = "...4...8...5..8.6.92.....7.......2.8..7.....6...196...6..9.45.1....5.....49......";
-// "9.......5.......46..3...72....4...69...7.3...56.9..4......8..57..215.....4...6.1.";
-// "....13......68..1.7.9....8.....45..1..5..63..34.......5....9....7..6259..2......4";
-// "..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..";
-// "5....28.......7..4..654.3..7..89...3.1....6.......4...8..35...9..7....8....2.....";
+// Create a 9x9 board comprised of an array with nine nested arrays each containing nine items
+// [
+//  ['.', '.', '.', '4', '.', '.', '.', '8', '.']
+//  ['.', '.', '5', '.', '.', '8', '.', '6', '.']
+//  ['9', '2', '.', '.', '.', '.', '.', '7', '.']
+//  ['.', '.', '.', '.', '.', '.', '2', '.', '8']
+//  ['.', '.', '7', '.', '.', '.', '.', '.', '6']
+//  ['.', '.', '.', '1', '9', '6', '.', '.', '.']
+//  ['6', '.', '.', '9', '.', '4', '5', '.', '1']
+//  ['.', '.', '.', '.', '5', '.', '.', '.', '.']
+//  ['.', '4', '9', '.', '.', '.', '.', '.', '.']
+// ]
 let board = str
     .split("")
     .reduce((acc, curr, index) => {
@@ -19,7 +25,9 @@ let board = str
     return acc;
 }, []);
 log("BOARD BEFORE FILTERING", board);
-// let redo: boolean = true;
+// establish a condition so that we don't loop forever;
+// I should change this at the end,
+/// maybe like 'let redo: boolean = true'
 let redo = 0;
 while (redo < 100) {
     board = board.map((item, index) => {
@@ -49,17 +57,20 @@ while (redo < 100) {
                 //   log("after row filter", possibilities);
                 // }
                 // filter out from possibilities any values already in the column of current cell
+                // step 1 - build up current column values
                 let columnValues = [];
                 let counter = 0;
                 while (counter < 9) {
                     columnValues.push(board[counter][index2]);
                     counter++;
                 }
+                // step 2 - filter out from remaining possibilites any matches in the current column
                 possibilities = possibilities.filter((val2) => !columnValues.includes(val2));
                 // if (index === 0 && index2 === 3) {
                 //   log("after column filter", possibilities);
                 // }
                 // filter out from possibilities any values already in the current 9x9 square of cells
+                // step 1 - build up current square values
                 let squareRowStart = 0;
                 let squareColumnStart = 0;
                 // 'index / 3 <= 1' tests whether we are in the first square from top to bottom
@@ -96,11 +107,16 @@ while (redo < 100) {
                 // if (index === 0 && index2 === 3) {
                 //   log("current square values", currentSquareValues);
                 // }
+                // step 2 - filter out matches in current square
                 possibilities = possibilities.filter((val3) => !currentSquareValues.includes(val3));
                 // if (index === 0 && index2 === 3) {
                 //   log("after square filter", possibilities);
                 // }
-                // test current cell against other indeterminate cells in same square using array.flat()
+                // create a function to test current cell against other indeterminate cells in same region
+                // to see if there are unique values among the possibilites for the region
+                // a 'board region' means either the current square, or current column, or current row
+                // if the current cell's list of possibilites contains a value unique to the region,
+                // then the proper value of that cell must be the unique value identified in the region
                 const uniqueValueInBoardRegion = (testArray) => {
                     let flattenedSquare = testArray
                         .filter((item) => typeof item === "object")
@@ -113,18 +129,19 @@ while (redo < 100) {
                         return count;
                     }
                     let occurencesObj = countOccurrences(flattenedSquare);
-                    function findKeyWithValueEqualsOne(obj) {
+                    function findFirstKeyWithValueEqualsOne(obj) {
                         for (let key in obj) {
                             if (obj[key] === 1) {
                                 return key;
                             }
                         }
                     }
-                    let uniqueKey = findKeyWithValueEqualsOne(occurencesObj);
+                    let uniqueKey = findFirstKeyWithValueEqualsOne(occurencesObj);
                     if (possibilities.includes(uniqueKey)) {
                         possibilities = [uniqueKey];
                     }
                 };
+                // call the function created above on the three relevant regions: viz. the row, column, and square
                 if (possibilities.length > 1) {
                     uniqueValueInBoardRegion(currentSquareValues);
                     uniqueValueInBoardRegion(item);
@@ -136,7 +153,6 @@ while (redo < 100) {
                 //     flattenedSquare
                 //   );
                 // }
-                // return value
                 if (possibilities.length === 1) {
                     return possibilities[0];
                 }
@@ -156,66 +172,24 @@ while (redo < 100) {
     // });
 }
 log("BOARD AFTER FILTERING", board);
-// let reducedBoard: string[] = board.reduce(
-//   (acc: [], curr: [], index: number) => {
-//     let newAcc: string[] = [...acc];
-//     curr.forEach((element) => {
-//       if (typeof element === "object") {
-//         newAcc.push(".");
-//       } else if (typeof element === "string") {
-//         newAcc.push(element);
-//       }
-//     });
-//     return newAcc;
-//   },
-//   []
-// );
-let flattenedBoard = board.flat();
-log("FLATTENED BOARD AFTER FIRST PASS", flattenedBoard);
-// This is commented out for ts-node execution, but needs to be unedited for HTML injection...
-// flattenedBoard.forEach((item: string | [], index: number) => {
-//   let cell: any = document.querySelector(`#cell${index}`);
-//   cell.innerText = item;
-// });
-// I can delete this, it's just interesting to see how one can use querySelectorAll on attributes/partial attributes
-// let cells: any = document.querySelectorAll("[id^='cell']");
-// cells.forEach((item, index) => {
-//   item.innerText = reducedBoard[index];
-// });
-// // THIS WHOLE BLOCK IS CAUSING PROBLEMS.
-//         // I THINK IT IS BECAUSE I AM CALLING item = item.map
-//         // INSIDE WHAT I START WITH AT 31 WHICH IS ALSO item = item.map.
-//         // I GUESS I COULD TRY TO CHANGE THIS SO THAT IT ALL HAPPENS AFTER THE BLOCK STARTING AT 31...
-//         // OR ELSE I COULD JUST FILTER THE CURRENT CELL RATHER THAN THE ENTIRE ROW AT ONCE...
-//         if (possibilities.length > 1) {
-//           //remove values for magic pairs such as two cells which have ["2","3"] in a row - this means that no other cells in that row can properly contain a "2" or a "3" and, as such, those can be filtered out
-//           let magicPair: string[] = [];
-//           let index1: number;
-//           let index2: number;
-//           item.forEach((itm: any, indx: number) => {
-//             if (typeof itm === "object" && itm.length === 2) {
-//               let restOfRow = item.slice(index + 1);
-//               restOfRow.forEach((itm2: any, indx2: number) => {
-//                 if (
-//                   itm2.length === 2 &&
-//                   itm[0] === itm2[0] &&
-//                   itm[1] === itm2[1]
-//                 ) {
-//                   magicPair = [...itm];
-//                   index1 = indx;
-//                   index2 = indx + 1 + indx2;
-//                 }
-//               });
-//             }
-//           });
-//           item = item.map((itm: any, indx: number) => {
-//             if (typeof itm === "string") {
-//               return itm;
-//             } else if (indx === index1 || index === index2) {
-//               return itm;
-//             } else {
-//               //filter out any magicPair[0] or magicPair[1] values from this array
-//               itm = itm.filter((value: string) => !magicPair.includes(value));
-//             }
-//           });
-//         }
+let redo2 = 0;
+while (redo2 < 100) {
+    board = board.map((item, index) => {
+        return (item = item.map((item2, index2) => {
+            if (item2.length > 1) {
+                // set up possibilites for current cell
+                let possibilities = item2;
+                if (possibilities.length === 1) {
+                    return possibilities[0];
+                }
+                else {
+                    return possibilities;
+                }
+            }
+            else {
+                return item2;
+            }
+        }));
+    });
+    redo2++;
+}
