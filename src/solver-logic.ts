@@ -30,9 +30,49 @@ let board: any[] = str
   }, []);
 log("BOARD BEFORE FILTERING", board);
 
+// Helper functions
+const findSquare = (
+  gridIndex: number,
+  rowIndex: number
+): { squareRowStart: number; squareColumnStart: number } => {
+  let squareRowStart: number = 0;
+  let squareColumnStart: number = 0;
+  // 'gridIndex / 3 <= 1' tests whether we are in the first square from top to bottom
+  if (gridIndex / 3 < 1) {
+    squareRowStart = 0;
+  } else if (gridIndex / 3 >= 1 && gridIndex / 3 < 2) {
+    squareRowStart = 3;
+  } else {
+    squareRowStart = 6;
+  }
+  // 'rowIndex /3 <= 1' tests whether we are in the first square from left to right
+  if (rowIndex / 3 < 1) {
+    squareColumnStart = 0;
+  } else if (rowIndex / 3 >= 1 && rowIndex / 3 < 2) {
+    squareColumnStart = 3;
+  } else {
+    squareColumnStart = 6;
+  }
+  return {
+    squareRowStart,
+    squareColumnStart,
+  };
+};
+
+const getColumnValues = (currentRowIndex: number): string[] => {
+  let column: string[] = [];
+  let counter: number = 0;
+  while (counter < 9) {
+    column.push(board[counter][currentRowIndex]);
+    counter++;
+  }
+  return column;
+};
+// End of helper functions
+
 // establish a condition so that we don't loop forever;
 // I should change this at the end,
-/// maybe like 'let redo: boolean = true'
+// maybe like 'let redo: boolean = true'
 let redo: number = 0;
 
 while (redo < 100) {
@@ -66,12 +106,7 @@ while (redo < 100) {
 
         // filter out from possibilities any values already in the column of current cell
         // step 1 - build up current column values
-        let columnValues: string[] = [];
-        let counter: number = 0;
-        while (counter < 9) {
-          columnValues.push(board[counter][index2]);
-          counter++;
-        }
+        let columnValues = getColumnValues(index2);
         // step 2 - filter out from remaining possibilites any matches in the current column
         possibilities = possibilities.filter(
           (val2) => !columnValues.includes(val2)
@@ -82,42 +117,23 @@ while (redo < 100) {
 
         // filter out from possibilities any values already in the current 9x9 square of cells
         // step 1 - build up current square values
-        let squareRowStart: number = 0;
-        let squareColumnStart: number = 0;
-        // 'index / 3 <= 1' tests whether we are in the first square from top to bottom
-        if (index / 3 < 1) {
-          // we need 0, 1, 2
-          squareRowStart = 0;
-        } else if (index / 3 >= 1 && index / 3 < 2) {
-          // we need 3, 4, 5
-          squareRowStart = 3;
-        } else {
-          // we need 6, 7, 8
-          squareRowStart = 6;
-        }
-        // 'index2 /3 <= 1' tests whether we are in the first square from left to right
-        if (index2 / 3 < 1) {
-          squareColumnStart = 0;
-        } else if (index2 / 3 >= 1 && index2 / 3 < 2) {
-          squareColumnStart = 3;
-        } else {
-          squareColumnStart = 6;
-        }
+
+        let currentSquare = findSquare(index, index2);
 
         let currentSquareValues: string[] = [
-          ...board[squareRowStart].slice(
-            squareColumnStart,
-            squareColumnStart + 3
+          ...board[currentSquare.squareRowStart].slice(
+            currentSquare.squareColumnStart,
+            currentSquare.squareColumnStart + 3
           ),
 
-          ...board[squareRowStart + 1].slice(
-            squareColumnStart,
-            squareColumnStart + 3
+          ...board[currentSquare.squareRowStart + 1].slice(
+            currentSquare.squareColumnStart,
+            currentSquare.squareColumnStart + 3
           ),
 
-          ...board[squareRowStart + 2].slice(
-            squareColumnStart,
-            squareColumnStart + 3
+          ...board[currentSquare.squareRowStart + 2].slice(
+            currentSquare.squareColumnStart,
+            currentSquare.squareColumnStart + 3
           ),
         ];
         // if (index === 0 && index2 === 3) {
@@ -210,7 +226,7 @@ let redo2: number = 0;
 
 while (redo2 < 10) {
   board = board.map((item: any, index: number) => {
-    //remove values for magic pairs such as two cells which have ["2","3"] in a row
+    // remove values for magic pairs such as two cells which have ["2","3"] in a row
     // this means that no other cells in that row can properly contain a "2" or a "3" and,
     // as such, those can be filtered out
     let magicPair: string[] = [];
@@ -237,24 +253,21 @@ while (redo2 < 10) {
       }
     });
 
-    if (index === 6) {
-      log("THE INDEXES ARE...", index1, index2);
-    }
-
-    let itemCopy = item.map((itm: any, indx: number) => {
-      if (typeof itm === "string") {
-        // log("RETURNED HERE 1");
-        return itm;
+    let itemCopy = item.map((cell: any, indx: number) => {
+      if (typeof cell === "string") {
+        return cell;
       } else if (indx === index1 || indx === index2) {
-        // log("RETURNED HERE 2");
-        return itm;
+        return cell;
       } else {
-        // filter out any magicPair[0] or magicPair[1] values from this array
-        // log("ITEM...", itm);
-        let itmCopy = itm.filter((value: string) => !magicPair.includes(value));
-        // log("ITEM COPY...", itmCopy);
-        // log("RETURNED HERE 3");
-        return itmCopy;
+        // filter out any magicPair[0] or magicPair[1] values from this cell's array
+        let cellCopy = cell.filter(
+          (value: string) => !magicPair.includes(value)
+        );
+        if (cellCopy.length === 1) {
+          return cellCopy[0];
+        } else {
+          return cellCopy;
+        }
       }
     });
     return itemCopy;
@@ -279,17 +292,10 @@ log("BOARD AFTER SECOND FILTERING", board);
 //   []
 // );
 
+// This is commented out for ts-node execution, but needs to be unedited for HTML injection...
 // let flattenedBoard: any[] = board.flat();
 // log("FLATTENED BOARD AFTER FIRST PASS", flattenedBoard);
-
-// This is commented out for ts-node execution, but needs to be unedited for HTML injection...
 // flattenedBoard.forEach((item: string | [], index: number) => {
 //   let cell: any = document.querySelector(`#cell${index}`);
 //   cell.innerText = item;
 // });
-
-// THIS WHOLE BLOCK IS CAUSING PROBLEMS.
-// I THINK IT IS BECAUSE I AM CALLING item = item.map
-// INSIDE WHAT I START WITH AT 31 WHICH IS ALSO item = item.map.
-// I GUESS I COULD TRY TO CHANGE THIS SO THAT IT ALL HAPPENS AFTER THE BLOCK STARTING AT 31...
-// OR ELSE I COULD JUST FILTER THE CURRENT CELL RATHER THAN THE ENTIRE ROW AT ONCE...
