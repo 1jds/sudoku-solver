@@ -3,7 +3,8 @@ const { log } = console;
 
 // The overall string to be solved
 let str =
-  "...4...8...5..8.6.92.....7.......2.8..7.....6...196...6..9.45.1....5.....49......";
+  "..5..839..3..........7...8...45..6.261.......2...49........24.5..9.8....56.......";
+// "...4...8...5..8.6.92.....7.......2.8..7.....6...196...6..9.45.1....5.....49......";
 
 // Create a 9x9 board comprised of an array with nine nested arrays each containing nine items
 // [
@@ -94,32 +95,21 @@ while (redo < 100) {
         if (item2.length > 1) {
           possibilities = item2;
         }
-        // if (index === 0 && index2 === 3) {
-        //   log("before any filtering", possibilities);
-        // }
 
+        // ROW FILTER
         // filter out from possibilites any values already in the row of current cell
         possibilities = possibilities.filter((val) => !item.includes(val));
-        // if (index === 0 && index2 === 3) {
-        //   log("after row filter", possibilities);
-        // }
 
+        // COLUMN FILTER
         // filter out from possibilities any values already in the column of current cell
-        // step 1 - build up current column values
         let columnValues = getColumnValues(index2);
-        // step 2 - filter out from remaining possibilites any matches in the current column
         possibilities = possibilities.filter(
           (val2) => !columnValues.includes(val2)
         );
-        // if (index === 0 && index2 === 3) {
-        //   log("after column filter", possibilities);
-        // }
 
+        // SQUARE FILTER
         // filter out from possibilities any values already in the current 9x9 square of cells
-        // step 1 - build up current square values
-
         let currentSquare = findSquare(index, index2);
-
         let currentSquareValues: string[] = [
           ...board[currentSquare.squareRowStart].slice(
             currentSquare.squareColumnStart,
@@ -136,21 +126,11 @@ while (redo < 100) {
             currentSquare.squareColumnStart + 3
           ),
         ];
-        // if (index === 0 && index2 === 3) {
-        //   log("current square values", currentSquareValues);
-        // }
-        // if (index === 0 && index2 === 3) {
-        //   log("current square values", currentSquareValues);
-        // }
-        // step 2 - filter out matches in current square
         possibilities = possibilities.filter(
           (val3) => !currentSquareValues.includes(val3)
         );
 
-        // if (index === 0 && index2 === 3) {
-        //   log("after square filter", possibilities);
-        // }
-
+        // UNIQUE IN REGION
         // create a function to test current cell against other indeterminate cells in same region
         // to see if there are unique values among the possibilites for the region
         // a 'board region' means either the current square, or current column, or current row
@@ -195,13 +175,6 @@ while (redo < 100) {
           uniqueValueInBoardRegion(columnValues);
         }
 
-        // if (index === 0 && index2 === 3) {
-        //   console.log(
-        //     "our flattened square of relevant values",
-        //     flattenedSquare
-        //   );
-        // }
-
         if (possibilities.length === 1) {
           return possibilities[0];
         } else {
@@ -213,18 +186,8 @@ while (redo < 100) {
     }));
   });
 
-  redo++;
-  // redo = false;
-  // board.forEach((arr: string[]) => {
-  //   arr.includes(".") ? (redo = true) : null;
-  // });
-}
+  log("BOARD AFTER FIRST FILTERING", board);
 
-log("BOARD AFTER FIRST FILTERING", board);
-
-let redo2: number = 0;
-
-while (redo2 < 10) {
   board = board.map((item: any, index: number) => {
     // remove values for magic pairs such as two cells which have ["2","3"] in a row
     // this means that no other cells in that row can properly contain a "2" or a "3" and,
@@ -272,10 +235,83 @@ while (redo2 < 10) {
     });
     return itemCopy;
   });
+  log("BOARD AFTER SECOND FILTERING", board);
 
-  redo2++;
+  // find magic pairs in columns
+  board.forEach((item: any, index: number) => {
+    let magicPair: string[] = [];
+    // these are now row indexes from the first dimension of the board array
+    let index1: number = 0;
+    let index2: number = 0;
+    let stableColumnIndex: number = 0;
+    let columnValues: string[] = [];
+
+    // map over 'columnValues' which is one of the nine columns in the sudoku board
+    item.forEach((item2: any, indx2: number) => {
+      stableColumnIndex = indx2;
+      columnValues = getColumnValues(indx2);
+      // for each item/cell in this row, check if it is an array of two items
+      columnValues.forEach((itm: any, indx: number) => {
+        if (typeof itm === "object" && itm.length === 2) {
+          let restOfColumn = itm.slice(indx + 1);
+          restOfColumn.forEach((itm2: any, indx3: number) => {
+            if (itm2.length === 2 && itm[0] === itm2[0] && itm[1] === itm2[1]) {
+              // if a magic pair is found, store it in this variable
+              magicPair = [...itm];
+              // store where the first of these pairs appears in the column (its index in the column)
+              index1 = indx;
+              // store where the second of these pairs appears in the column (its index in the column)
+              index2 = indx + 1 + indx3;
+            }
+          });
+        }
+      });
+    });
+
+    columnValues.forEach((cell: any, indx: number) => {
+      if (typeof cell === "string") {
+        return undefined;
+      } else if (indx === index1 || indx === index2) {
+        return undefined;
+      } else {
+        // filter out any magicPair[0] or magicPair[1] values from this cell's array
+        let cellCopy = cell.filter(
+          (value: string) => !magicPair.includes(value)
+        );
+        if (cellCopy.length === 1) {
+          board[indx][stableColumnIndex] = cellCopy[0];
+          log("this got fired 1");
+        } else {
+          board[indx][stableColumnIndex] = cellCopy;
+          log("this got fired 2", indx, stableColumnIndex, cellCopy);
+        }
+      }
+    });
+  });
+  // board = board.map((item: any, index: number) => {
+  //   return(
+  //     item = item.map((item2: any, indx2: number) => {
+  //       if (item2.length > 1) {
+  //         let columnValues = getColumnValues(indx2);
+
+  //         let possibilities = [...item2]
+
+  //       } else {
+  //         return item2
+  //       }
+  //     })
+  //   )
+
+  // });
+
+  // find magic pairs in squares
+
+  // find triples such as [1,3], [1,3,4], [1,3,4] in rows
+  // find triples such as [1,3], [1,3,4], [1,3,4] in columns
+  // find triples such as [1,3], [1,3,4], [1,3,4] in squares
+
+  redo++;
 }
-log("BOARD AFTER SECOND FILTERING", board);
 
 // let reducedBoard: string[] = board.reduce(
 //   (acc: [], curr: [], index: number) => {
