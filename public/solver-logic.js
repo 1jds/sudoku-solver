@@ -171,25 +171,58 @@ while (redo < 100) {
     //   arr.includes(".") ? (redo = true) : null;
     // });
 }
-log("BOARD AFTER FILTERING", board);
+log("BOARD AFTER FIRST FILTERING", board);
 let redo2 = 0;
-while (redo2 < 100) {
+while (redo2 < 10) {
     board = board.map((item, index) => {
-        return (item = item.map((item2, index2) => {
-            if (item2.length > 1) {
-                // set up possibilites for current cell
-                let possibilities = item2;
-                if (possibilities.length === 1) {
-                    return possibilities[0];
-                }
-                else {
-                    return possibilities;
-                }
+        //remove values for magic pairs such as two cells which have ["2","3"] in a row
+        // this means that no other cells in that row can properly contain a "2" or a "3" and,
+        // as such, those can be filtered out
+        let magicPair = [];
+        let index1 = 0;
+        let index2 = 0;
+        // map over 'item' which is one of the nine rows in the sudoku board
+        item.forEach((itm, indx) => {
+            // for each item/cell in this row, check if it is an array of two items
+            if (typeof itm === "object" && itm.length === 2) {
+                // if so, cut off the rest of the row after the found pair
+                let restOfRow = item.slice(indx + 1);
+                // map over the rest of the row and see if there is another cell with the same pair of values
+                restOfRow.forEach((itm2, indx2) => {
+                    if (itm2.length === 2 && itm[0] === itm2[0] && itm[1] === itm2[1]) {
+                        // if a magic pair is found, store it in this variable
+                        magicPair = [...itm];
+                        // // store where the first of these pairs appears in the row (its index in the row)
+                        index1 = indx;
+                        // store where the second of these pairs appears in the row (its index in the row)
+                        index2 = indx + 1 + indx2;
+                    }
+                });
+            }
+        });
+        if (index === 6) {
+            log("THE INDEXES ARE...", index1, index2);
+        }
+        let itemCopy = item.map((itm, indx) => {
+            if (typeof itm === "string") {
+                // log("RETURNED HERE 1");
+                return itm;
+            }
+            else if (indx === index1 || indx === index2) {
+                // log("RETURNED HERE 2");
+                return itm;
             }
             else {
-                return item2;
+                // filter out any magicPair[0] or magicPair[1] values from this array
+                // log("ITEM...", itm);
+                let itmCopy = itm.filter((value) => !magicPair.includes(value));
+                // log("ITEM COPY...", itmCopy);
+                // log("RETURNED HERE 3");
+                return itmCopy;
             }
-        }));
+        });
+        return itemCopy;
     });
     redo2++;
 }
+log("BOARD AFTER SECOND FILTERING", board);
