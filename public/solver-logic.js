@@ -1,25 +1,17 @@
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
-var log = console.log;
+"use strict";
+const { log } = console;
 // ..9..5.1. 85.4....2 432...... 1...69.83 .9.....6. 62.71...9 ......194 5....4.37 .4.3..6..
 // Solve this...
 // The overall string to be solved
-var str = "...4...8...5..8.6.92.....7.......2.8..7.....6...196...6..9.45.1....5.....49......";
+let str = "...4...8...5..8.6.92.....7.......2.8..7.....6...196...6..9.45.1....5.....49......";
 // "9.......5.......46..3...72....4...69...7.3...56.9..4......8..57..215.....4...6.1.";
 // "....13......68..1.7.9....8.....45..1..5..63..34.......5....9....7..6259..2......4";
 // "..9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..";
 // "5....28.......7..4..654.3..7..89...3.1....6.......4...8..35...9..7....8....2.....";
-var board = str
+let board = str
     .split("")
-    .reduce(function (acc, curr, index) {
-    var innerIndex = Math.floor(index / 9);
+    .reduce((acc, curr, index) => {
+    const innerIndex = Math.floor(index / 9);
     if (!acc[innerIndex]) {
         acc[innerIndex] = [];
     }
@@ -28,13 +20,13 @@ var board = str
 }, []);
 log("BOARD BEFORE FILTERING", board);
 // let redo: boolean = true;
-var redo = 0;
+let redo = 0;
 while (redo < 100) {
-    board = board.map(function (item, index) {
-        return (item = item.map(function (item2, index2) {
+    board = board.map((item, index) => {
+        return (item = item.map((item2, index2) => {
             if (item2 === "." || item2.length > 1) {
                 // set up possibilites for current cell
-                var possibilities_1 = [
+                let possibilities = [
                     "1",
                     "2",
                     "3",
@@ -46,30 +38,30 @@ while (redo < 100) {
                     "9",
                 ];
                 if (item2.length > 1) {
-                    possibilities_1 = item2;
+                    possibilities = item2;
                 }
                 // if (index === 0 && index2 === 3) {
                 //   log("before any filtering", possibilities);
                 // }
                 // filter out from possibilites any values already in the row of current cell
-                possibilities_1 = possibilities_1.filter(function (val) { return !item.includes(val); });
+                possibilities = possibilities.filter((val) => !item.includes(val));
                 // if (index === 0 && index2 === 3) {
                 //   log("after row filter", possibilities);
                 // }
                 // filter out from possibilities any values already in the column of current cell
-                var columnValues_1 = [];
-                var counter = 0;
+                let columnValues = [];
+                let counter = 0;
                 while (counter < 9) {
-                    columnValues_1.push(board[counter][index2]);
+                    columnValues.push(board[counter][index2]);
                     counter++;
                 }
-                possibilities_1 = possibilities_1.filter(function (val2) { return !columnValues_1.includes(val2); });
+                possibilities = possibilities.filter((val2) => !columnValues.includes(val2));
                 // if (index === 0 && index2 === 3) {
                 //   log("after column filter", possibilities);
                 // }
                 // filter out from possibilities any values already in the current 9x9 square of cells
-                var squareRowStart = 0;
-                var squareColumnStart = 0;
+                let squareRowStart = 0;
+                let squareColumnStart = 0;
                 // 'index / 3 <= 1' tests whether we are in the first square from top to bottom
                 if (index / 3 < 1) {
                     // we need 0, 1, 2
@@ -93,46 +85,50 @@ while (redo < 100) {
                 else {
                     squareColumnStart = 6;
                 }
-                var currentSquareValues_1 = __spreadArray(__spreadArray(__spreadArray([], board[squareRowStart].slice(squareColumnStart, squareColumnStart + 3), true), board[squareRowStart + 1].slice(squareColumnStart, squareColumnStart + 3), true), board[squareRowStart + 2].slice(squareColumnStart, squareColumnStart + 3), true);
+                let currentSquareValues = [
+                    ...board[squareRowStart].slice(squareColumnStart, squareColumnStart + 3),
+                    ...board[squareRowStart + 1].slice(squareColumnStart, squareColumnStart + 3),
+                    ...board[squareRowStart + 2].slice(squareColumnStart, squareColumnStart + 3),
+                ];
                 // if (index === 0 && index2 === 3) {
                 //   log("current square values", currentSquareValues);
                 // }
                 // if (index === 0 && index2 === 3) {
                 //   log("current square values", currentSquareValues);
                 // }
-                possibilities_1 = possibilities_1.filter(function (val3) { return !currentSquareValues_1.includes(val3); });
+                possibilities = possibilities.filter((val3) => !currentSquareValues.includes(val3));
                 // if (index === 0 && index2 === 3) {
                 //   log("after square filter", possibilities);
                 // }
                 // test current cell against other indeterminate cells in same square using array.flat()
-                var uniqueValueInBoardRegion = function (testArray) {
-                    var flattenedSquare = testArray
-                        .filter(function (item) { return typeof item === "object"; })
+                const uniqueValueInBoardRegion = (testArray) => {
+                    let flattenedSquare = testArray
+                        .filter((item) => typeof item === "object")
                         .flat();
                     function countOccurrences(arr) {
-                        var count = {};
-                        arr.forEach(function (item) {
+                        const count = {};
+                        arr.forEach((item) => {
                             count[item] = (count[item] || 0) + 1;
                         });
                         return count;
                     }
-                    var occurencesObj = countOccurrences(flattenedSquare);
+                    let occurencesObj = countOccurrences(flattenedSquare);
                     function findKeyWithValueEqualsOne(obj) {
-                        for (var key in obj) {
+                        for (let key in obj) {
                             if (obj[key] === 1) {
                                 return key;
                             }
                         }
                     }
-                    var uniqueKey = findKeyWithValueEqualsOne(occurencesObj);
-                    if (possibilities_1.includes(uniqueKey)) {
-                        possibilities_1 = [uniqueKey];
+                    let uniqueKey = findKeyWithValueEqualsOne(occurencesObj);
+                    if (possibilities.includes(uniqueKey)) {
+                        possibilities = [uniqueKey];
                     }
                 };
-                if (possibilities_1.length > 1) {
-                    uniqueValueInBoardRegion(currentSquareValues_1);
+                if (possibilities.length > 1) {
+                    uniqueValueInBoardRegion(currentSquareValues);
                     uniqueValueInBoardRegion(item);
-                    uniqueValueInBoardRegion(columnValues_1);
+                    uniqueValueInBoardRegion(columnValues);
                 }
                 // if (index === 0 && index2 === 3) {
                 //   console.log(
@@ -141,11 +137,11 @@ while (redo < 100) {
                 //   );
                 // }
                 // return value
-                if (possibilities_1.length === 1) {
-                    return possibilities_1[0];
+                if (possibilities.length === 1) {
+                    return possibilities[0];
                 }
                 else {
-                    return possibilities_1;
+                    return possibilities;
                 }
             }
             else {
@@ -174,7 +170,7 @@ log("BOARD AFTER FILTERING", board);
 //   },
 //   []
 // );
-var flattenedBoard = board.flat();
+let flattenedBoard = board.flat();
 log("FLATTENED BOARD AFTER FIRST PASS", flattenedBoard);
 // This is commented out for ts-node execution, but needs to be unedited for HTML injection...
 // flattenedBoard.forEach((item: string | [], index: number) => {
